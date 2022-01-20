@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Music Converter</title>
+	<link rel="shortcut icon" href=".ico" type="image/x-icon">
+</head>
+<body>
+<div id="background">
+	<h1 style="display: none;user-select: none;" id="dbl">Double click to download</h1>
+	<a hidden href="/getDownloadedFile" download="">
+	</a>
+	<div class="container" id="downloader">
+		<input autofocus type="search" name="yt" id="yt" list="yt-datalist" placeholder="youtube link...">
+	</div>
+	<div class="container" id="set-data">
+		<form id="form" action="download/">
+			<label for="artist">Artist</label><br>
+			<input type="search" name="artist" id="artist" value=""><br><br>
+			<label for="song">Song Title</label><br>
+			<input type="search" name="song" id="song" value=""><br><br>
+			<label for="fileName">File name</label><br>
+			<div style="width: 100%;display: flex;flex-direction: row; align-items: center;"><input type="search" name="fileName" id="fileName"><img width="50px" height="25px" src="reverse.png" id="reverse" alt="reverse"></div><br><br>
+			<label for="genre">Genre</label><br>
+			<input type="search" id="genre" name="genre" value=""><br><br>
+			<label for="album">Album</label><br>
+			<input type="search" id="album" name="album" value=""><br><br>
+			<input type="hidden" id="url" name="url">
+			
+			<input type="submit" id="submit" value="Download">
+		</form>
+	</div>
+	<div id="loader">
+	
+</div>
+</div>
+</body>
+<style>
+	* {
+		box-sizing: border-box;
+		color: white;
+	}
+	body {
+		margin: 0;
+	}
+	#background {
+		height: 100vh;
+		width: 100vw;
+		background: rgb(2,0,36);
+		background: linear-gradient(28deg, rgba(2,0,36,1) 0%, rgba(49,49,192,1) 37%, rgba(0,212,255,1) 100%);
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+	}
+	input {
+		border: 2px solid black;
+		padding: .5em;
+		margin-bottom: 4px;
+		width: 100%;
+		height: 2rem;
+		color: #000;
+	}
+	form {
+		width: 100%;
+	}
+	
+	#loader {
+		display: none;
+		position: absolute;
+		width: 10vw;
+		height: 10vw;
+		background-color: black;
+		border-radius: 40%;
+		z-index: 0;
+		mix-blend-mode: hard-light;
+		animation: anim 2s infinite -1s;
+	}
+	#loader::after {
+		animation: anim2 2s infinite;
+		content: "";
+		z-index: 10;
+		position: absolute;
+		transform: translate(.75vw,.75vw);
+		width: 8.5vw;
+		height: 8.5vw;
+		background-color: grey;
+		border-radius: 40%;
+	}
+	
+	@keyframes anim {
+		0% {
+			transform: rotate(0deg) 
+		}
+		50% {
+			transform: rotate(180deg) 
+		}
+		100% {
+			transform: rotate(360deg) 
+		}
+	}
+	@keyframes anim2 {
+		0% {
+			transform: translate(.75vw,.75vw) rotate(0deg) 
+		}
+		50% {
+			transform: translate(.75vw,.75vw) rotate(180deg) 
+		}
+		100% {
+			transform: translate(.75vw,.75vw) rotate(360deg) 
+		}
+	}
+	.container {
+		width: 50vw;
+	}
+
+	#set-data {
+		display: none;
+		width: 30vw;
+	}
+
+	#container {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+
+		width: auto;
+		height: 50%;
+
+		border: 20px solid rgb(93 255 106);
+		border-radius: 30px;
+
+		display: flex;
+		flex-direction: row;
+		gap: 20px;
+		align-items: center;
+		justify-content: center;
+		font-size: large;
+	}
+</style>
+<script>
+	const id = _ => document.getElementById(_);
+	let suggestions = [], url, isReversed = window.localStorage.isReversed;
+
+
+
+	function loader(flag) {
+		if (flag) {
+			id('downloader').style.display = 'none';// first call
+			if (id('set-data').style.display === 'flex') id('set-data').style.display = 'none';// third call
+
+			id('loader').style.display = 'block';
+			
+		} else {
+			id('loader').style.display = 'none';
+			id('set-data').style.display = 'flex';// second call
+		}
+	}
+	
+	function setFileName(e) {
+		let song = e?.target.id === 'song' ? e?.target.value : id('song').value
+		let artist = e?.target.id === 'artist' ? e?.target.value : id('artist').value
+		id('fileName').value = isReversed ? song + ' - ' + artist : artist + ' - ' + song;
+	}
+
+
+	id('yt').addEventListener('keydown', e => {
+		if (e.code === 'Enter') {
+			url = e.target.value;
+			if (!url.startsWith('http')) return;
+			e.target.value = '';
+
+			loader(true);
+
+			fetch(window.origin + '/getData/' + encodeURI(url)).then(res => res.json()).then(data => {
+				id('downloader').style.display = 'none';
+				id('set-data').style.display = 'flex';
+				
+				const artist = data.artist || '';
+				const song = data.song || '';
+
+				id('url').value = url;// so that it is included in the request sent by the form
+				id('artist').value = artist;
+				id('song').value = song;
+
+				const title = isReversed ? song + ' - ' + artist : artist + ' - ' + song;
+				id('fileName').value = song && artist ? title : (data.title || '');
+				loader(false);
+			});	
+		}	
+	});	
+
+	id('form').addEventListener('submit', () => loader(true));	
+	id('song').addEventListener('input', setFileName);
+	id('artist').addEventListener('input', setFileName);
+
+	id('reverse').addEventListener('click', () => {
+		isReversed = !isReversed;
+		window.localStorage.isReversed = isReversed;
+		setFileName();
+	});
+
+	window.onload = () => {
+		const identifier = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 5);
+
+
+		if (window.location.pathname.startsWith('/ready')) {
+			id('downloader').style.display = 'none';
+			id('set-data').style.display = 'none';
+			id('dbl').style.display = 'block';
+
+
+			window.addEventListener('dblclick', () => {
+				window.open(window.origin + '/downloadFileHtml/' + decodeURI(window.location.pathname.replace('/ready/','')))
+				window.location.pathname = '';
+			});
+		}
+	}	
+</script>
+</html>
