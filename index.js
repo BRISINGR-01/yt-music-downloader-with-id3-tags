@@ -50,6 +50,7 @@ async function routes(req, res) {
             process.env.isDownlading = true;
             // console.log(`\nDownloading ${data.videoDetails.title}`);
             // const start = Date.now();
+            process.env.mp3Path = path.resolve(__dirname, data.videoDetails.videoId + '.mp3');
             let stream = ytdl(Url, {
                 quality: 'highestaudio',
             });
