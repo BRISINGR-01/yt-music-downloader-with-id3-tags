@@ -10,6 +10,9 @@
     "fluent-ffmpeg": "^2.1.2",
     "ytdl-core@latest": "^4.9.2"
   },
+  "engines": {
+    "node": "14.x"
+  },
   "author": {
     "name": "BRISINGR-01",
     "url": "https://github.com/BRISINGR-01"
