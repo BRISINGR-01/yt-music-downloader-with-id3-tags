@@ -49,8 +49,8 @@ async function routes(req, res) {
             }));
             res.end();
             process.env.isDownlading = true;
-            console.log(`\nDownloading ${data.videoDetails.title}`);
-            const start = Date.now();
+            // console.log(`\nDownloading ${data.videoDetails.title}`);
+            // const start = Date.now();
             let stream = ytdl(Url, {
                 quality: 'highestaudio',
             });
@@ -58,7 +58,7 @@ async function routes(req, res) {
             .audioBitrate(128)
             .save(mp3Path)
             .on('end', () => {
-                console.log(`Done for ${(Date.now() - start) / 1000}s`);
+                // console.log(`Done for ${(Date.now() - start) / 1000}s`);
                 process.env.isDownlading = false;
             });
         });
