@@ -105,5 +105,5 @@ async function routes(req, res) {
 }
 
 const server = http.createServer(routes);
-server.listen(3000);
+server.listen(process.env.PORT || 3000);
 server.on('error', console.log)
