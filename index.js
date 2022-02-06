@@ -9,7 +9,6 @@ const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-const mp3Path = path.resolve(__dirname, 'mp3.mp3')
 
 
 
@@ -56,11 +55,12 @@ async function routes(req, res) {
             });
             ffmpeg(stream)
             .audioBitrate(128)
-            .save(mp3Path)
+            .save(process.env.mp3Path)
             .on('end', () => {
                 // console.log(`Done for ${(Date.now() - start) / 1000}s`);
                 process.env.isDownlading = false;
-            });
+            })
+            .on('error', console.log);
         });
         
     }
@@ -88,16 +88,17 @@ async function routes(req, res) {
                 }
             }, 100);
         })
-        nodeID3.write(tags, mp3Path);
+        nodeID3.write(tags, process.env.mp3Path);
         res.statusCode = 302;
         res.setHeader('Location', '/ready/' + encodeURI(data.get('fileName')));
         return res.end();
     }
 
     if (url === '/getDownloadedFile') {
-        const mp3Path = path.resolve(__dirname, 'mp3.mp3')
+        if (!fs.existsSync(process.env.mp3Path)) return res.end();
 
-        res.write(fs.readFileSync(mp3Path));
+        res.write(fs.readFileSync(process.env.mp3Path));
+        fs.unlinkSync(process.env.mp3Path);
         return res.end();
     }
  
