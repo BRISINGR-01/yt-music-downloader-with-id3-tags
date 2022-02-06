@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A very simple YouTube music downloader which sets the ID3 tags of the downloaded file",
   "main": "./index.js",
+  "bin": "./index.js",
   "dependencies": {
     "node-id3": "^0.2.3",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -19,6 +20,11 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/BRISINGR-01/yt-music-downloader-with-id3-tags"
+  },
+  "pkg": {
+    "assets": [
+      "assets/**/*"
+    ]
   },
   "keywords": [
     "ytdl-core",
