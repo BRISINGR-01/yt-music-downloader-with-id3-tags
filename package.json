@@ -5,13 +5,10 @@
   "main": "./index.js",
   "bin": "./index.js",
   "dependencies": {
-    "node-id3": "^0.2.3",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "fluent-ffmpeg": "^2.1.2",
-    "ytdl-core": "^4.11.1"
-  },
-  "engines": {
-    "node": "14.x"
+    "node-id3": "^0.2.3",
+    "ytdl-core": "^4.10.0"
   },
   "author": {
     "name": "BRISINGR-01",
