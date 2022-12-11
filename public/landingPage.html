@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Music Converter</title>
+	<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="background">
+	<div class="container" id="downloader">
+		<input autofocus onkeydown="search" type="search" id="searchbar" placeholder="youtube link...">
+        <img class="searchPic" onclick="search()" src="./search.svg">
+	</div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // var socket = io();
+
+        const searchbar = document.getElementById('searchbar');
+
+        searchbar.addEventListener("keypress", ({ code }) => code === 'Enter' && search());
+
+        function search() {
+            try {
+                const ytUrl = new URL(searchbar.value);
+                if (ytUrl.host === "www.youtube.com") {
+                    // socket.emit("search", ytUrl.href)
+                    fetch(window.location.origin +'/download/' + ytUrl.href).then(res => res.json()).then(({ id }) => window.location.pathname = 'tags/' + id)
+                }; 
+            } catch (error) {
+                // the user didn't put a url
+            }
+        }
+    </script>
+</html>

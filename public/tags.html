@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Music Converter</title>
+	<link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="background">
+	<div class="container" id="set-data">
+		<form id="form" action="download/">
+			<label for="artist">Artist</label><br>
+			<input type="search" name="artist" id="artist" value=""><br><br>
+			<label for="song">Song Title</label><br>
+			<input type="search" name="song" id="song" value=""><br><br>
+			<label for="fileName">File name</label><br>
+			<div style="width: 100%;display: flex;flex-direction: row; align-items: center;"><input type="search" name="fileName" id="fileName"><img width="50px" height="25px" src="reverse.png" id="reverse" alt="reverse"></div><br><br>
+			<label for="genre">Genre</label><br>
+			<input type="search" id="genre" name="genre" value=""><br><br>
+			<label for="album">Album</label><br>
+			<input type="search" id="album" name="album" value=""><br><br>
+			<input type="hidden" id="url" name="url">
+			
+			<input type="submit" id="submit" value="Download">
+		</form>
+	</div>
+	<div id="loader">
+	
+</div>
+</div>
+</body>
+<script>
+	const id = _ => document.getElementById(_);
+	let suggestions = [], url, isReversed = window.localStorage.isReversed;
+
+
+
+	function loader(flag) {
+		if (flag) {
+			id('downloader').style.display = 'none';// first call
+			if (id('set-data').style.display === 'flex') id('set-data').style.display = 'none';// third call
+
+			id('loader').style.display = 'block';
+			
+		} else {
+			id('loader').style.display = 'none';
+			id('set-data').style.display = 'flex';// second call
+		}
+	}
+	
+	function setFileName(e) {
+		let song = e?.target.id === 'song' ? e?.target.value : id('song').value
+		let artist = e?.target.id === 'artist' ? e?.target.value : id('artist').value
+		id('fileName').value = isReversed ? song + ' - ' + artist : artist + ' - ' + song;
+	}
+
+	function search(val = id('yt').value) {
+		if (!val.startsWith('http')) return;
+		loader(true);
+		url = val;
+
+		fetch(window.origin + '/getData/' + encodeURI(val)).then(res => res.json()).then(data => {
+			id('downloader').style.display = 'none';
+			id('set-data').style.display = 'flex';
+			
+			const artist = data.artist || '';
+			const song = data.song || '';
+
+			id('url').value = val;// so that it is included in the request sent by the form
+			id('artist').value = artist;
+			id('song').value = song;
+
+			const title = isReversed ? song + ' - ' + artist : artist + ' - ' + song;
+			id('fileName').value = song && artist ? title : (data.title || '');
+			loader(false);
+		});	
+	}
+
+
+	id('form').addEventListener('submit', () => loader(true));	
+	id('song').addEventListener('input', setFileName);
+	id('artist').addEventListener('input', setFileName);
+
+	id('reverse').addEventListener('click', () => {
+		isReversed = !isReversed;
+		window.localStorage.isReversed = isReversed;
+		setFileName();
+	});
+
+	window.onload = () => {
+		if (window.location.pathname.startsWith('/ready')) {
+			id('downloader').style.display = 'none';
+			id('set-data').style.display = 'none';
+			id('dbl').style.display = 'block';
+
+			window.addEventListener('click', () => {
+				window.open(window.origin + '/downloadFileHtml/' + decodeURI(window.location.pathname.replace('/ready/','')))
+				window.location.pathname = '';
+			});
+		}
+	}	
+</script>
+</html>

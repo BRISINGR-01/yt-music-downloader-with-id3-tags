@@ -9,70 +9,22 @@ const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 
-const getPath = (p) => path.resolve(__dirname, "public", ...p);
 
-const mimeTypes = {
-    ".mp4": "video/mp4",
-    ".mp3": "video/mp3",
-    ".css": "text/css",
-    ".html": "text/html",
-    ".js": "text/javascript",
-    ".png": "image/png",
-    ".png": "image/png",
-    ".svg": "image/svg+xml",
-}
 
-function serveStatic(staticPath, res) {
-    console.log(staticPath)
-    res.setHeader('Content-Type', mimeTypes[path.parse(staticPath).ext]);
-    res.write(fs.readFileSync(staticPath));
-}
 
 async function routes(req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "POST, GET");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     const url = req.url;
-    const requests = url.split("/").filter(Boolean);
-    console.log(url, requests)
-    
-    if (requests.length === 0) {
-        serveStatic(getPath(["landingPage.html"]), res)
-        
+    // console.log(url);
+        if (url.endsWith('ico')) {
+            res.setHeader('Content-Type', 'favicon/ico');
+            res.write(fs.readFileSync(path.resolve(__dirname, 'assets', 'favicon.ico')));
+            return res.end();
+        }
+    if (url === '/reverse.png') {
+        res.setHeader('Content-Type', 'image/png');
+        res.write(fs.readFileSync(`${__dirname}${path.sep}/assets${path.sep}reverse.png`));
         return res.end();
     }
-    
-    if (fs.existsSync(getPath(requests.slice(-1)))) {
-        serveStatic(getPath(requests.slice(-1)), res);
-        
-        return res.end();
-    }
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     if (url === '/' || url .startsWith('/ready/')) {
         const form = fs.readFileSync(path.resolve(__dirname, 'assets', './form.html'));
 		res.setHeader('Content-Type', 'text/html');
@@ -109,6 +61,7 @@ async function routes(req, res) {
                 // console.log(`Done for ${(Date.now() - start) / 1000}s`);
                 process.env.isDownlading = false;
             })
+            .on('data', console.log)
             .on('error', console.log);
         });
         
