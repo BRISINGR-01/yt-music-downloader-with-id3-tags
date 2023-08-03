@@ -1,7 +1,6 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const nodeID3 = require('node-id3');
 const readline = require('readline');
 var Stream = require('stream').Transform;
 const ytdl = require('ytdl-core');
@@ -11,7 +10,7 @@ ffmpeg.setFfmpegPath(ffmpegPath);
 
 
 
-let Url = "https://www.youtube.com/watch?v=eMQuofsOOzo&ab_channel=CalvinHarrisVEVO"
+let Url = "https://www.youtube.com/watch?v=NJUHrNa8fWw&list=RDMM&index=2&ab_channel=MIRO"
 
 ytdl.getInfo(Url).then(data => {
   let mp3Path = path.resolve(__dirname, data.videoDetails.videoId + '.mp3');
